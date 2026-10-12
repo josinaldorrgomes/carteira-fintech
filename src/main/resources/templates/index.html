@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel · Carteira Fintech</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">Carteira <span class="gold">Fintech</span></div>
+    <div class="user">
+        <span>Olá, <strong sec:authentication="name">usuário</strong></span>
+        <form th:action="@{/logout}" method="post">
+            <button class="linkout" type="submit">Sair</button>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="alert" th:if="${mensagem}" th:text="${mensagem}">comprovante</div>
+
+    <div class="grid">
+        <!-- Formulario de pagamento -->
+        <div class="card">
+            <div class="kicker">Nova transação</div>
+            <h2>Realizar pagamento</h2>
+            <div class="rule"></div>
+
+            <form th:action="@{/pagamentos}" th:object="${pagamentoForm}" method="post">
+                <label for="tipo">Meio de pagamento</label>
+                <select id="tipo" th:field="*{tipo}">
+                    <option value="" disabled selected>Selecione...</option>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}">PIX</option>
+                </select>
+                <div class="erro" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}">erro tipo</div>
+
+                <label for="valor">Valor (R$)</label>
+                <input type="number" id="valor" step="0.01" min="0.01" th:field="*{valor}" placeholder="0,00">
+                <div class="erro" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}">erro valor</div>
+
+                <button class="btn gold" type="submit">Pagar</button>
+            </form>
+        </div>
+
+        <!-- Historico -->
+        <div class="card">
+            <div class="kicker">Trilha de auditoria</div>
+            <h2>Minhas transações</h2>
+            <div class="rule"></div>
+
+            <p class="empty" th:if="${#lists.isEmpty(transacoes)}">
+                Nenhuma transação ainda. Faça o primeiro pagamento ao lado.
+            </p>
+
+            <table th:unless="${#lists.isEmpty(transacoes)}">
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Meio</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${transacoes}">
+                    <td th:text="${#temporals.format(t.criadoEm, 'dd/MM HH:mm')}">10/10 12:00</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${t.tipo.name() == 'PIX'} ? 'pix' : (${t.tipo.name() == 'CARTAO'} ? 'cartao' : 'boleto')"
+                              th:text="${t.tipo}">PIX</span>
+                    </td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(t.valor, 1, 'POINT', 2, 'COMMA')}">R$ 50,00</td>
+                    <td><span class="ok" th:if="${t.aprovado}">Aprovado</span>
+                        <span class="erro" th:unless="${t.aprovado}">Recusado</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="footer">UniEVANGÉLICA · Programação Orientada a Objetos · Semana 11 — Interfaces em Java</div>
+
+</body>
+</html>

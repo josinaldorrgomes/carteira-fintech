@@ -1,0 +1,24 @@
+# Sobe apenas o banco PostgreSQL para o projeto.
+# Uso:  docker compose up -d
+# (a aplicacao Spring Boot roda por fora, com ./mvnw spring-boot:run)
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: carteira-postgres
+    environment:
+      POSTGRES_DB: carteira
+      POSTGRES_USER: carteira
+      # Em producao isto viria de um gerenciador de segredos, nunca fixo no arquivo.
+      POSTGRES_PASSWORD: troque-esta-senha
+    ports:
+      - "5432:5432"
+    volumes:
+      - carteira_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carteira -d carteira"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  carteira_pgdata:
