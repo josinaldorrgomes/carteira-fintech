@@ -67,12 +67,37 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Banco em memoria H2: permite rodar/testar sem instalar o PostgreSQL -->
+        <!-- Banco em memoria H2: permite rodar/testar sem instalar nada -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Driver do MySQL (so em tempo de execucao) -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Driver do MariaDB (so em tempo de execucao) -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          Para usar OUTRO banco (SQL Server, Oracle, etc.), basta adicionar aqui o
+          driver JDBC correspondente e informar os dados de conexao no application.properties.
+          Exemplo (SQL Server):
+            <dependency>
+              <groupId>com.microsoft.sqlserver</groupId>
+              <artifactId>mssql-jdbc</artifactId>
+              <scope>runtime</scope>
+            </dependency>
+        -->
 
         <!-- Testes (JUnit 5, Mockito, Spring Test) -->
         <dependency>

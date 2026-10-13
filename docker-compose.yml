@@ -1,8 +1,16 @@
-# Sobe apenas o banco PostgreSQL para o projeto.
-# Uso:  docker compose up -d
-# (a aplicacao Spring Boot roda por fora, com ./mvnw spring-boot:run)
+# Sobe o banco de dados do projeto em contêiner (opcional).
+# A aplicacao Spring Boot roda por fora, com ./mvnw spring-boot:run.
+#
+#   PostgreSQL (padrao):  docker compose up -d
+#   MySQL:                docker compose --profile mysql up -d
+#
+# Depois, aponte a aplicacao para o banco escolhido:
+#   PostgreSQL ->  DB_PROFILE=postgres
+#   MySQL      ->  DB_PROFILE=mysql
 services:
-  db:
+
+  # ---- PostgreSQL (sobe com: docker compose up -d) ----
+  postgres:
     image: postgres:16-alpine
     container_name: carteira-postgres
     environment:
@@ -20,5 +28,26 @@ services:
       timeout: 5s
       retries: 5
 
+  # ---- MySQL (sobe com: docker compose --profile mysql up -d) ----
+  mysql:
+    image: mysql:8.4
+    container_name: carteira-mysql
+    profiles: ["mysql"]
+    environment:
+      MYSQL_DATABASE: carteira
+      MYSQL_USER: carteira
+      MYSQL_PASSWORD: troque-esta-senha
+      MYSQL_ROOT_PASSWORD: troque-esta-senha-root
+    ports:
+      - "3306:3306"
+    volumes:
+      - carteira_mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "carteira", "-ptroque-esta-senha"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   carteira_pgdata:
+  carteira_mysqldata:
